@@ -1,0 +1,52 @@
+name: release-docker
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build-docker-images:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - BASE_IMAGE: ubuntu:20.04
+            BUILDER_IMAGE: golang:1.21-bullseye
+            IMAGE_TAG: 1-21-eye-ubu-20-04
+          - BASE_IMAGE: ubuntu:22.04
+            BUILDER_IMAGE: golang:1.21-bullseye
+            IMAGE_TAG: 1-21-eye-ubu-22-04
+          - BASE_IMAGE: debian:bookworm
+            BUILDER_IMAGE: golang:1.21-bookworm
+            IMAGE_TAG: 1-21-boo-deb-boo
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          #platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.REPOSITORY }}:${{ matrix.IMAGE_TAG }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          build-args: |
+            BASE_IMAGE=${{ matrix.BASE_IMAGE }}
+            BUILDER_IMAGE=${{ matrix.BUILDER_IMAGE }}
+            GARBLE_HASH=9378ec959a6da66e334db960dd7afba0e4f37aed
