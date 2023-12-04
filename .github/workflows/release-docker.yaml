@@ -22,6 +22,9 @@ jobs:
           - BASE_IMAGE: debian:bookworm
             BUILDER_IMAGE: golang:1.21-bookworm
             IMAGE_TAG: 1-21-boo-deb-boo
+          - BASE_IMAGE: debian:bullseye
+            BUILDER_IMAGE: golang:1.21-bullseye
+            IMAGE_TAG: 1-21-eye-debian
     steps:
       -
         name: Checkout
