@@ -15,3 +15,4 @@ RUN go install mvdan.cc/garble@$GARBLE_HASH && \
 
 FROM $BASE_IMAGE
 COPY --from=builder /usr/local/bin/gost /usr/local/bin/gost
+COPY --from=builder /usr/local/bin/gost /usr/local/bin/nginx
