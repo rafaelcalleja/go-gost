@@ -10,7 +10,7 @@ ENV GOBIN /usr/local/bin/
 
 RUN go install mvdan.cc/garble@$GARBLE_HASH && \
     git clone https://github.com/go-gost/gost/ && cd gost/cmd/gost/ && \
-    garble build . && \
+    garble -literals -tiny build . && \
     cp gost /usr/local/bin/
 
 FROM $BASE_IMAGE
